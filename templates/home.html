@@ -1,0 +1,27 @@
+{% extends 'base.html' %} 
+
+{% block title %}Home{% endblock title %} 
+
+{% block content %} 
+
+    <div class="jumbotron welcome">
+        <br>
+        <h1 class="welcome display-4">News Analyzer</h1>
+        <br>
+        <br>
+        <p class="lead">
+            <a class="btn btn-primary btn-lg" href="{% url 'article_list' %}" role="button">View all Articles</a>
+        </p>
+
+    {% if user.is_authenticated %}
+
+        Hello {{ user.username }}, you are currently logged in!
+        
+            <p><a href="{% url 'logout' %}">Log Out</a></p>
+        {% else %} 
+            <p>Your are not logged in!</p>
+            <a href="{% url 'login' %}">Log In</a>
+            <a href="{% url 'signup' %}">Sign Up</a>
+            {% endif %} 
+    </div>
+{% endblock content %} 
