@@ -89,7 +89,7 @@ class TextAnalyzer():
         for t in txt:
          self._content += str(txt)
         # print("content = ", self._content)
-        return
+        return 
     
     #reset the content variable when needed
     def reset_content(self):
@@ -144,6 +144,8 @@ class TextAnalyzer():
     # calculate the positivity score
     def calculate_positivity_score(self):
         tally = 0
+        tallyPos = 0
+        tallyNeg = 0
         p = open('positive.txt', "r")        
         pos = p.read().split()
         
@@ -152,10 +154,13 @@ class TextAnalyzer():
         for word in self.words:
             if word in pos:
                 tally += 1
+                tallyPos += 1
             else:
                 if word in neg:
                     tally -= 1
-        
+                    tallyNeg += 1
+        print("tallyPos: ", tallyPos)
+        print("tallyNeg: ", tallyNeg)
         return tally
 
         
@@ -204,7 +209,7 @@ class TextAnalyzer():
         words = self._words(casesensitive=True)
         # print("back from words", words)
         self.word_count = len(words)
-        print("number of words = ", self.word_count)
+        #print("number of words = ", self.word_count)
         if self.word_count == 0:
             print("no content found please try again later")
             return
@@ -214,7 +219,7 @@ class TextAnalyzer():
             words_length += len(word)
             
         self.avg_word_length = round(words_length / self.word_count, 2) 
-        print ("average word length = ", self.avg_word_length)
+        # print ("average word length = ", self.avg_word_length)
         self.reset_content()
         self.distinct_word_count = 0
         words_upper = self._words(casesensitive=False)
@@ -225,11 +230,11 @@ class TextAnalyzer():
             if not word in wcounts:
                 wcounts.append(word)
                 self.distinct_word_count += 1
-        print("distinct word count = ", self.distinct_word_count)
+        #print("distinct word count = ", self.distinct_word_count)
         tally = self.calculate_positivity_score()
-        print ("Tally = ", tally)
+        #print ("Tally = ", tally)
         self.positivity = round(tally / self.word_count * 1000)
-        print("positivity index = ", self.positivity)
+        #print("positivity index = ", self.positivity)
         self.reset_content()
         self._cwords = self.common_words()
         #self.plot_common_words()

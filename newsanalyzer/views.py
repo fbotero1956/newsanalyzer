@@ -59,7 +59,7 @@ class ReadRss:
             print(e)
         print('self.status_code ', self)
         try:    
-            self.soup = BeautifulSoup(self.r.text, 'lxml')
+            self.soup = BeautifulSoup(self.r.text, 'html.parser')
         except Exception as e:
             print('Could not parse the xml: ', self.url)
             print(e)
@@ -72,10 +72,10 @@ class ReadRss:
                 print("invalid index is " + str(i))
                 self.articles[i] = []
             i += 1
-        self.ten_articles = list(itertools.islice(self.articles,2))
+        self.ten_articles = list(itertools.islice(self.articles,4))
         self.articles = self.ten_articles
-        print(self.num_articles)
-        print(len(self.articles))
+        # print(self.num_articles)
+        # print(len(self.articles))
         try:    
             self.articles_dicts = [{'title':a.find('title').text,'link':a.link.next_sibling.replace('\n','').replace('\t',''),'description':a.find('description').text,'pubdate':a.find('pubdate').text} for a in self.articles]
             self.urls = [d['link'] for d in self.articles_dicts if 'link' in d]
@@ -110,51 +110,62 @@ class ReadRss:
 def rsscall(request):
    #Get the variable text
    text = request.POST['text']
-   print('successful 1 ' + text)
+   # print('successful 1 ' + text)
    #Do whatever with the input variable text
    feed = ReadRss(text, headers)
    # Get list of urls in feed
-   print('successful 2')
+   # print('successful 2')
    if feed:
       print("found " + str(feed.num_articles) + " articles")
       # print list of urls in feed
-      print(feed.urls)
+      # print(feed.urls)
               
       # print article data as a list of dicts
       # print(feed.articles_dicts)
  
       # Show article titles
-      print(feed.titles)
+      # print(feed.titles)
         
       # Show descriptions
-      print(feed.descriptions)
+      # print(feed.descriptions)
         
       # Show publication dates
-      print(feed.pub_dates)
+      # print(feed.pub_dates)
+
+      # print(len(feed.urls))
       
-      cwords = TextAnalyzer(feed.urls[0], "url")
-      print ("The number of words in the article is: ", cwords.word_count)
-     # cwords = TextAnalyzer('newsanalyzer\pride-and-prejudice.txt', "path")
-      myText = '''The outlook wasn't brilliant for the Mudville Nine that day; 
-        the score stood four to two, with but one inning more more more more more good good good good good to play.
-        And then when Cooney died at first, and Barrows did the same,
-        a sickly silence fell upon the patrons of the game.'''
-      # cwords = TextAnalyzer(myText, "text")
-      response = feed.urls[0]
-      if cwords.word_count > 0:
-        common_words = cwords.common_words(minlen=4, maxlen=11)
-        print("The most common word of at least 3 letters in text is: ", common_words[0][0])
-        positivity_score = cwords.calculate_positivity_score()
-        print("The positivity score is: ", positivity_score)
-        print("The positivity index is: ", cwords.positivity)
-        
+      i = 0
+      while i <= 3:
+        print ("****************************")
+        print ("****************************")
+        cwords = TextAnalyzer(feed.urls[i], "url")
+        print ("Title: ", feed.titles[i])
+        print ("URL to article: ", feed.urls[i])
+        print ("Date published: ", feed.pub_dates[i])
+        abstract = list(itertools.islice(feed.descriptions[i], 0, feed.descriptions[i].find('<')))
+        listToStr = ''.join([str(elem) for elem in abstract])
+        print ("Abstract: ", listToStr)
+        # print ("Abstract: ", feed.descriptions[i])
+
+
+        response = feed.urls[0]
+
+        if cwords.word_count > 0:
+            print ("The number of words in the article is: ", cwords.word_count)
+            print("distinct word count = ", cwords.distinct_word_count)
+
+            common_words = cwords.common_words(minlen=5, maxlen=12)
+            for j in range(5):
+                print("The most common word of at least 5 letters in text is: ", common_words[j][0])
+            print ("average word length = ", cwords.avg_word_length)
+            positivity_score = cwords.calculate_positivity_score()
+            
+            print("The positivity score is: ", positivity_score)
+            print("The positivity index is: ", cwords.positivity)
+        i += 1
    else:
        response = 'feed retrival failed'
    #Send the response 
 
    return HttpResponse(response)
 
-   text = '''The outlook wasn't brilliant for the Mudville Nine that day;
-the score stood four to two, with but one inning more to play.
-And then when Cooney died at first, and Barrows did the same,
-a sickly silence fell upon the patrons of the game.'''
