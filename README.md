@@ -9,3 +9,5 @@ Use – The site is intended to be used by general population to pre-screen news
 Personas - Two personas will be considered, a technology savvy person and one that is a neophyte and requires help.
 
 Architecture – The application will be a full stack application using a Python back-end and authentication, with a database to store the articles that have been analyzed and the results of the analysis.
+
+RSS Feed - the code to get the RSS feed came from jcchouinard.com

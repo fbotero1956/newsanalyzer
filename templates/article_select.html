@@ -4,6 +4,12 @@
 
 {% block content %} 
 
-   <h1>Article Select</h1>
-   
-{% endblock content %} 
+   <h1>Select News Feed</h1>
+   <p>Please select a news feed to analyze, from those listed below:</p>
+   <div class="container">
+      <button class="btn btn-large btn-primary" type="button" onclick="getRSS('http://rss.cnn.com/rss/cnn_topstories.rss')">CNN Top Stories RSS</button>
+      <button class="btn btn-large btn-primary" type="button" onclick="getRSS('http://rss.cnn.com/rss/money_latest.rss')">CNN Top Financial Stories RSS</button>
+      <button class="btn btn-large btn-primary" type="button" onclick="getRSS('http://rss.cnn.com/rss/cnn_allpolitics.rss')">CNN Top Political Stories RSS</button>
+
+   </div>
+{% endblock content %}  

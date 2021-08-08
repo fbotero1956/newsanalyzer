@@ -1,0 +1,810 @@
+
+Code
+
+Python 3
+Analyzing Text
+Write the TextAnalyzer class in the cell below. We have already imported some libraries that should be useful to you.
+
+# 
+# Text Analyzer, written by Felipe Botero for Rutgers Python programming course
+#
+
+# library imports
+import requests, re
+from bs4 import BeautifulSoup
+from lxml import html
+from urllib.request import urlopen
+from collections import Counter
+import statistics as stats
+import string
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
+#main class definition
+class TextAnalyzer():
+    # validate that the src_type and the src match
+    def validate_src_type(self, src, src_type):  
+            #if url then the src string must start with http
+            if src_type == "url":
+                txt = src
+                x = re.search("^http.", txt)
+                if x:
+                    #print('valid url provided')
+                    return x
+                else:
+                    print('invalid url')
+                    return x
+            # if path then the file extension should be txt
+            if src_type == "path":
+                txt = src
+                x = re.search("txt$", txt)
+                #print("search result ", x)
+                if x != "None":
+                    #print('valid path provided')
+                    return x
+                else:
+                    print('invalid path')
+                    return x
+            #if text then the src should be a valid string
+            if src_type == "text":
+                txt = src
+                x = isinstance(txt, str)
+                if x:
+                    #print('valid text provided')
+                    return x
+                else:
+                    print('invalid text')
+                    return x
+            # if there is a value and it is not url, path or text then raise an error
+            else:
+                print('invalid parameter passed')
+                x = False
+                return x
+   
+    # if src_type is not specified then examine the src parameter to determine the type        
+    def discover_src_type(self, src):
+            txt = src
+            #if the string starts with http then assume it is a url
+            x = re.search("^http", txt)
+            if x:
+                d_src_type = "url"
+                return d_src_type
+            #if the string ends with txt then assume it is a path
+            x = re.search("txt$", txt)
+            if x:
+                d_src_type = "path"
+                return d_src_type
+            #otherwise if the parameter is a string pass it in
+            x = isinstance(txt, str)
+            if x:
+                d_src_type = "text"
+                return d_src_type
+            else:
+                #if none of the above then raise an error
+                print('invalid parameter, must be url, path or string')
+                d_src_type = "Error"
+                return d_src_type
+    
+    #sets _content to the text within the "tag" html element
+    def set_content_to_tag(self, tag, tag_id=None):
+        response = urlopen(self._src).read()
+
+        soup = BeautifulSoup(response, 'html')
+        txt = soup.find(id=tag_id)
+        self._orig_content = str(txt) 
+        txt = soup.find(id=tag_id).text
+        self._content = str(txt)
+        #print("content = ", self._content)
+        return
+    
+    #reset the content variable when needed
+    def reset_content(self):
+        self._content = self._orig_content
+        return
+    
+    # convert the content text into a list of words
+    def _words(self, casesensitive=False):
+        if casesensitive:
+            words = self._content.split()
+        else:
+            words = self._content.upper().split()
+        
+        words = [word.strip(string.punctuation) for word in words]   
+        self._content = words
+        return self._content
+        
+    #determine the word frequency within the text
+    def common_words(self, minlen=1, maxlen=100, count=10, casesensitive=False):
+        counts = dict()
+        words = self._words(casesensitive=casesensitive)
+
+        for word in words:
+            if len(word) >= minlen and len(word) <= maxlen:
+                if word in counts:
+                    counts[word] += 1
+                else:
+                    counts[word] = 1
+       
+        tmp_words = Counter(counts)
+        com_words = tmp_words.most_common(count)
+        return com_words
+    
+    #determine the character frequency
+    def char_distribution(self, casesensitive=False, letters_only=False):
+        counts = dict()
+        
+        chars = self._content
+        if not casesensitive:
+            chars = self._content.upper()
+
+        for char in chars:
+            if char.isalpha():
+                if char in counts:
+                    counts[char] += 1
+                else:
+                    counts[char] = 1
+        #print("char counts = ", counts)
+        sort_counts = sorted(counts.items(), key=lambda x: x[1], reverse=True)
+        return sort_counts
+    
+    #plot the most common words
+    def plot_common_words(self, minlen=1, maxlen=100, count=10, casesensitive=False):
+        cwd = self._cwords
+
+        char = []
+        count = []
+        for a in cwd:
+            char.append(a[0])
+            count.append(a[1])
+        plt.bar(char, count)
+        plt.title("Most common words found in the text")
+        plt.xlabel("Words")
+        plt.ylabel("Frequency")
+        plt.show()
+        return
+    
+    #plot the character distribution results
+    def plot_char_distribution(self, casesensitive=False, letters_only=False):
+        ccd = self._cchars
+
+        char = []
+        count = []
+        for a in ccd:
+            char.append(a[0])
+            count.append(a[1])
+        plt.bar(char, count)
+        plt.title("Most common characters found in the text")
+        plt.xlabel("characters")
+        plt.ylabel("Frequency")
+        plt.show()
+        return
+
+    # calculate the positivity score
+    def calculate_positivity_score(self):
+        tally = 0
+        p = open('positive.txt', "r")        
+        pos = p.read().split()
+        
+        n = open('negative.txt', "r")
+        neg = n.read().split()
+        for word in self.words:
+            if word in pos:
+                tally += 1
+            else:
+                if word in neg:
+                    tally -= 1
+        
+        return tally
+
+        
+    def __init__(self, src, src_type='none'):
+        #src_type will specify discover, url, path, text
+        #validate src to start with http and end with txtig_content
+        #print ('First step', src_type)
+        #print('path = ', src)
+        self._src = src
+        if not src_type == 'none':                         
+            x = self.validate_src_type(src, src_type)
+        if not src_type == 'none':
+            if x:
+                self._src_type = src_type
+            else:
+                print ('Error in src_type validation')
+                return src_type
+        else:
+            d_src_type = self.discover_src_type(src)
+            if not d_src_type == "Error":
+                self._src_type = d_src_type
+            else:
+                print ('Error in src_type discovery')
+                return d_src_type
+        
+        # initialize the properties
+        if self._src_type == "path":
+            p = open(src, "r")
+        #   print('file is open')
+            self._content = p.read()
+        #   print('file is read')
+            self._orig_content = self._content
+        #   print(self._content)
+        elif self._src_type == "text":
+            self._content = src
+            self._orig_content = self._content
+        elif self._src_type == "url":
+            self.set_content_to_tag(tag="article", tag_id="content-main")
+            self._orig_content = self._content
+        else:
+            print('Error in src_type')
+        #   print("content = ", self._content)
+        words = self._words(casesensitive=True)
+        #  print("back from words", words)
+        self.word_count = len(words)
+        #print("number of words = ", self.word_count)
+        words_length = 0
+        for word in words:
+            words_length += len(word)
+            
+        self.avg_word_length = round(words_length / self.word_count, 2) 
+        #print ("average word length = ", self.avg_word_length)
+        self.reset_content()
+        self.distinct_word_count = 0
+        words_upper = self._words(casesensitive=False)
+        # print ("uppercase = ", words_upper)
+        self.words = words_upper
+        wcounts = []
+        for word in words_upper:
+            if not word in wcounts:
+                wcounts.append(word)
+                self.distinct_word_count += 1
+        #print("distinct word count = ", self.distinct_word_count)
+        tally = self.calculate_positivity_score()
+        #print ("Tally = ", tally)
+        self.positivity = round(tally / self.word_count * 1000)
+        #print("positivity index = ", self.positivity)
+        self.reset_content()
+        self._cwords = self.common_words()
+        #self.plot_common_words()
+        self.reset_content()
+        self._cchars= self.char_distribution()
+        #self.plot_char_distribution()
+# 
+# Text Analyzer, written by Felipe Botero for Rutgers Python programming course
+#
+​
+# library imports
+import requests, re
+from bs4 import BeautifulSoup
+from lxml import html
+from urllib.request import urlopen
+from collections import Counter
+import statistics as stats
+import string
+import matplotlib.pyplot as plt
+import pandas as pd
+​
+​
+#main class definition
+class TextAnalyzer():
+    # validate that the src_type and the src match
+    def validate_src_type(self, src, src_type):  
+            #if url then the src string must start with http
+            if src_type == "url":
+                txt = src
+                x = re.search("^http.", txt)
+                if x:
+                    #print('valid url provided')
+                    return x
+                else:
+                    print('invalid url')
+                    return x
+            # if path then the file extension should be txt
+            if src_type == "path":
+                txt = src
+                x = re.search("txt$", txt)
+                #print("search result ", x)
+                if x != "None":
+                    #print('valid path provided')
+                    return x
+                else:
+                    print('invalid path')
+                    return x
+            #if text then the src should be a valid string
+            if src_type == "text":
+                txt = src
+                x = isinstance(txt, str)
+                if x:
+                    #print('valid text provided')
+                    return x
+                else:
+                    print('invalid text')
+                    return x
+            # if there is a value and it is not url, path or text then raise an error
+            else:
+                print('invalid parameter passed')
+                x = False
+                return x
+   
+    # if src_type is not specified then examine the src parameter to determine the type        
+    def discover_src_type(self, src):
+            txt = src
+            #if the string starts with http then assume it is a url
+            x = re.search("^http", txt)
+            if x:
+                d_src_type = "url"
+                return d_src_type
+            #if the string ends with txt then assume it is a path
+            x = re.search("txt$", txt)
+            if x:
+                d_src_type = "path"
+                return d_src_type
+            #otherwise if the parameter is a string pass it in
+            x = isinstance(txt, str)
+            if x:
+                d_src_type = "text"
+                return d_src_type
+            else:
+                #if none of the above then raise an error
+                print('invalid parameter, must be url, path or string')
+                d_src_type = "Error"
+                return d_src_type
+    
+    #sets _content to the text within the "tag" html element
+    def set_content_to_tag(self, tag, tag_id=None):
+        response = urlopen(self._src).read()
+​
+        soup = BeautifulSoup(response, 'html')
+        txt = soup.find(id=tag_id)
+        self._orig_content = str(txt) 
+        txt = soup.find(id=tag_id).text
+        self._content = str(txt)
+        #print("content = ", self._content)
+        return
+    
+    #reset the content variable when needed
+    def reset_content(self):
+        self._content = self._orig_content
+        return
+    
+    # convert the content text into a list of words
+    def _words(self, casesensitive=False):
+        if casesensitive:
+            words = self._content.split()
+        else:
+            words = self._content.upper().split()
+        
+        words = [word.strip(string.punctuation) for word in words]   
+        self._content = words
+        return self._content
+        
+    #determine the word frequency within the text
+    def common_words(self, minlen=1, maxlen=100, count=10, casesensitive=False):
+        counts = dict()
+        words = self._words(casesensitive=casesensitive)
+​
+        for word in words:
+            if len(word) >= minlen and len(word) <= maxlen:
+                if word in counts:
+                    counts[word] += 1
+                else:
+                    counts[word] = 1
+       
+        tmp_words = Counter(counts)
+        com_words = tmp_words.most_common(count)
+        return com_words
+    
+    #determine the character frequency
+    def char_distribution(self, casesensitive=False, letters_only=False):
+        counts = dict()
+        
+        chars = self._content
+        if not casesensitive:
+            chars = self._content.upper()
+​
+        for char in chars:
+            if char.isalpha():
+                if char in counts:
+                    counts[char] += 1
+                else:
+                    counts[char] = 1
+        #print("char counts = ", counts)
+        sort_counts = sorted(counts.items(), key=lambda x: x[1], reverse=True)
+        return sort_counts
+    
+    #plot the most common words
+    def plot_common_words(self, minlen=1, maxlen=100, count=10, casesensitive=False):
+        cwd = self._cwords
+​
+        char = []
+        count = []
+        for a in cwd:
+            char.append(a[0])
+            count.append(a[1])
+        plt.bar(char, count)
+        plt.title("Most common words found in the text")
+        plt.xlabel("Words")
+        plt.ylabel("Frequency")
+        plt.show()
+        return
+    
+    #plot the character distribution results
+    def plot_char_distribution(self, casesensitive=False, letters_only=False):
+        ccd = self._cchars
+​
+        char = []
+        count = []
+        for a in ccd:
+            char.append(a[0])
+            count.append(a[1])
+        plt.bar(char, count)
+        plt.title("Most common characters found in the text")
+        plt.xlabel("characters")
+        plt.ylabel("Frequency")
+        plt.show()
+        return
+​
+    # calculate the positivity score
+    def calculate_positivity_score(self):
+        tally = 0
+        p = open('positive.txt', "r")        
+        pos = p.read().split()
+        
+        n = open('negative.txt', "r")
+        neg = n.read().split()
+        for word in self.words:
+            if word in pos:
+                tally += 1
+            else:
+                if word in neg:
+                    tally -= 1
+        
+        return tally
+​
+        
+    def __init__(self, src, src_type='none'):
+        #src_type will specify discover, url, path, text
+        #validate src to start with http and end with txtig_content
+        #print ('First step', src_type)
+        #print('path = ', src)
+        self._src = src
+        if not src_type == 'none':                         
+            x = self.validate_src_type(src, src_type)
+        if not src_type == 'none':
+            if x:
+                self._src_type = src_type
+            else:
+                print ('Error in src_type validation')
+                return src_type
+        else:
+            d_src_type = self.discover_src_type(src)
+            if not d_src_type == "Error":
+                self._src_type = d_src_type
+            else:
+                print ('Error in src_type discovery')
+                return d_src_type
+        
+        # initialize the properties
+        if self._src_type == "path":
+            p = open(src, "r")
+        #   print('file is open')
+            self._content = p.read()
+        #   print('file is read')
+            self._orig_content = self._content
+        #   print(self._content)
+        elif self._src_type == "text":
+            self._content = src
+            self._orig_content = self._content
+        elif self._src_type == "url":
+            self.set_content_to_tag(tag="article", tag_id="content-main")
+            self._orig_content = self._content
+        else:
+            print('Error in src_type')
+        #   print("content = ", self._content)
+        words = self._words(casesensitive=True)
+        #  print("back from words", words)
+        self.word_count = len(words)
+        #print("number of words = ", self.word_count)
+        words_length = 0
+        for word in words:
+            words_length += len(word)
+            
+        self.avg_word_length = round(words_length / self.word_count, 2) 
+        #print ("average word length = ", self.avg_word_length)
+        self.reset_content()
+        self.distinct_word_count = 0
+        words_upper = self._words(casesensitive=False)
+        # print ("uppercase = ", words_upper)
+        self.words = words_upper
+        wcounts = []
+        for word in words_upper:
+            if not word in wcounts:
+                wcounts.append(word)
+                self.distinct_word_count += 1
+        #print("distinct word count = ", self.distinct_word_count)
+        tally = self.calculate_positivity_score()
+        #print ("Tally = ", tally)
+        self.positivity = round(tally / self.word_count * 1000)
+        #print("positivity index = ", self.positivity)
+        self.reset_content()
+        self._cwords = self.common_words()
+        #self.plot_common_words()
+        self.reset_content()
+        self._cchars= self.char_distribution()
+        #self.plot_char_distribution()
+        
+Tests
+When you have finished, you should run the tests below. If you get errors, you should do your very best to fix those errors before submitting the project.
+
+If you submit your project while still getting errors, you should explain that in your project submission email. The very first thing we will do to grade your project is run it through these tests. If it fails any of the tests, and you have not indicated that you are aware of specific test failures, we will stop grading and ask you to resubmit.
+
+import unittest
+​
+url = 'https://www.webucator.com/how-to/address-by-bill-clinton-1997.cfm'
+path = 'pride-and-prejudice.txt'
+text = '''The outlook wasn't brilliant for the Mudville Nine that day;
+the score stood four to two, with but one inning more to play.
+And then when Cooney died at first, and Barrows did the same,
+a sickly silence fell upon the patrons of the game.'''
+​
+class TestTextAnalyzer(unittest.TestCase):
+    def test_discover_url(self):
+        ta = TextAnalyzer(url)
+        self.assertEqual(ta._src_type, 'url')
+    def test_discover_path(self):
+        ta = TextAnalyzer(path)
+        self.assertEqual(ta._src_type, 'path')
+    def test_discover_text(self):
+        ta = TextAnalyzer(text)
+        self.assertEqual(ta._src_type, 'text')
+    def test_set_content_to_tag(self):
+        ta = TextAnalyzer(url)
+        ta.set_content_to_tag('div','content-main')
+        self.assertEqual(ta._content[0:25], '\n\nAddress by Bill Clinton')
+    def test_reset_content(self):
+        ta = TextAnalyzer(url)
+        ta.set_content_to_tag('div','content-main')
+        ta.reset_content()
+        self.assertEqual(ta._content[0], '<')
+    def test_common_words(self):
+        ta = TextAnalyzer(path, src_type='path')
+        common_words = ta.common_words(minlen=5, maxlen=10)
+        liz = common_words[0]
+        self.assertEqual(liz[0],'ELIZABETH')
+    def test_avg_word_length(self):
+        ta = TextAnalyzer(text, src_type='text')
+        self.assertEqual(ta.avg_word_length, 4.16)
+    def test_word_count(self):
+        ta = TextAnalyzer(text, src_type='text')
+        self.assertEqual(ta.word_count, 45)
+    def test_distinct_word_count(self):
+        ta = TextAnalyzer(text, src_type='text')
+        self.assertEqual(ta.distinct_word_count, 38)
+    def test_char_distribution(self):
+        ta = TextAnalyzer(text, src_type='text')
+        char_dist = ta.char_distribution(letters_only=True)
+        self.assertEqual(char_dist[1][1], 20)
+    def test_positivity(self):
+        ta = TextAnalyzer(text, src_type='text')
+        positivity = ta.positivity
+        self.assertEqual(positivity, -44)
+        
+suite = unittest.TestLoader().loadTestsFromTestCase(TestTextAnalyzer)
+unittest.TextTestRunner().run(suite)
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 26.884s
+
+OK
+<unittest.runner.TextTestResult run=11 errors=0 failures=0>
+Plots
+You should also run the cell below to make sure your plot methods work. They should produce plots that look like the images found at:
+
+character-distribution.png
+common-words.png
+%matplotlib inline
+import numpy as np
+import pandas as pd
+​
+pd.set_option('display.max_columns', 10)
+pd.set_option('display.max_rows', 10)
+​
+ta = TextAnalyzer('pride-and-prejudice.txt', src_type='path')
+ta.plot_common_words(minlen=5)
+ta.plot_char_distribution(letters_only=True)
+
+
+Exam: Using the TextAnalyzer
+Question 1
+How many words are in the text of William Henry Harrison's 1841 inaugaral address?
+
+The address can be found at https://www.webucator.com/how-to/william-henry-harrisons-inaugural-address.cfm.
+Its contents are in a div tag with the id 'content-main'.
+class q1():
+    num_words = TextAnalyzer('https://www.webucator.com/how-to/william-henry-harrisons-inaugural-address.cfm', "url")
+    print ("The number of words in Harrison's speech is: ", num_words.word_count)
+class q1():
+    num_words = TextAnalyzer('https://www.webucator.com/how-to/william-henry-harrisons-inaugural-address.cfm', "url")
+    print ("The number of words in Harrison's speech is: ", num_words.word_count)
+The number of words in Harrison's speech is:  8430
+Question 2
+What is the least common letter in pride-and-prejudice.txt?
+
+class q2():
+    least_common_letter = TextAnalyzer('pride-and-prejudice.txt', "path")
+    letter = least_common_letter.char_distribution()
+    print ("The least common letter in Pride and Prejudice is: ", least_common_letter._cchars[-1][0])
+class q2():
+    least_common_letter = TextAnalyzer('pride-and-prejudice.txt', "path")
+    letter = least_common_letter.char_distribution()
+    print ("The least common letter in Pride and Prejudice is: ", least_common_letter._cchars[-1][0])
+The least common letter in Pride and Prejudice is:  Q
+Question 3
+What is the most common 11-letter word in pride-and-prejudice.txt?
+
+class q3():
+    cwords = TextAnalyzer('pride-and-prejudice.txt', "path")
+    common_words = cwords.common_words(minlen=11, maxlen=11)
+    print("The most common word of 11 letters in P&P is: ", common_words[0][0])
+    
+class q3():
+    cwords = TextAnalyzer('pride-and-prejudice.txt', "path")
+    common_words = cwords.common_words(minlen=11, maxlen=11)
+    print("The most common word of 11 letters in P&P is: ", common_words[0][0])
+    
+The most common word of 11 letters in P&P is:  NETHERFIELD
+Question 4
+What is the average word length in pride-and-prejudice.txt?
+
+class q4():
+    cwords = TextAnalyzer('pride-and-prejudice.txt', "path")
+    print("The average word lenght in P&P is: ", cwords.avg_word_length)
+The average word lenght in P&P is:  4.43
+Question 5
+How many distinct words are there in pride-and-prejudice.txt?
+
+class q5():
+    cwords = TextAnalyzer('pride-and-prejudice.txt', "path")
+    print("The number of distinct words in P&P is: ", cwords.distinct_word_count)
+​
+The number of distinct words in P&P is:  6839
+Question 6
+How many words, ignoring case, are used only once in pride-and-prejudice.txt?
+
+class q6():
+    cwords = TextAnalyzer('pride-and-prejudice.txt', "path")
+    num_words_used_once = 0
+    cwd = cwords.common_words(count=10000, casesensitive=False)
+    
+    char = []
+    count = []
+    for a in cwd:
+        char.append(a[0])
+        count.append(a[1])
+    w = 0
+    
+    while w < len(count):
+        if count[w] == 1:
+            num_words_used_once += 1
+        w += 1
+            
+    print("The number of words used once is: ", num_words_used_once)
+The number of words used once is:  2886
+Question 7
+How many distinct words in pride-and-prejudice.txt have less than five characters, at least one character of which is a capital 'A'.
+
+class q7():
+    cwords = TextAnalyzer('pride-and-prejudice.txt', "path")
+    num_words_with_A = 0
+    cwd = cwords.common_words(count=10000, maxlen=4, casesensitive=True)
+    
+    char = []
+    count = []
+    for a in cwd:
+        char.append(a[0])
+        count.append(a[1])
+    w = 0 
+    while w < len(count):
+        if not char[w].find('A'):
+            num_words_with_A += 1
+            print(char[w])
+        w += 1
+            
+    print("The number of words less than five characters and including an 'A' is: ", num_words_with_A)
+And
+As
+A
+At
+All
+Are
+An
+Ah
+Aye
+Anne
+Away
+Any
+The number of words less than five characters and including an 'A' is:  12
+Question 8
+A palindrome is a word spelled the same forwards and backwards, like BOB. How many distinct palindromes are there in pride-and-prejudice.txt.
+
+Only include words with at least three letters.
+class q8():
+    cwords = TextAnalyzer('pride-and-prejudice.txt', "path")
+    num_palindromes = 0
+    cwd = cwords.common_words(count=10000, minlen=3)
+    
+    char = []
+    count = []
+    for a in cwd:
+        char.append(a[0])
+        count.append(a[1])
+    p = 0 
+    for w in char:
+        palin = ""
+        i = -1
+        while i >=  len(w) * -1:
+            palin = palin + w[i]
+            i -= 1
+        drome = str(palin)
+ 
+        if drome == w:
+            num_palindromes += 1
+            print(drome)
+            
+    print("The number of palindromes in P&P (not counting P&P) is: ", num_palindromes)
+DID
+MADAM
+EYE
+MA'AM
+SEES
+ERE
+NOON
+PEEP
+GIG
+The number of palindromes in P&P is:  9
+Question 9
+What is the positivity rating of 'pride-and-prejudice.txt'
+
+class q9():
+    cwords = TextAnalyzer('pride-and-prejudice.txt', "path")
+    print("The positivity rating of P&P is: ", cwords.positivity)
+The positivity rating of P&P is:  11
+Question 10
+Which of the following addresses (originally from http://www.inaugural.senate.gov/swearing-in/addresses) has the lowest positivity rating?
+
+https://www.webucator.com/how-to/george-bushs-inaugural-address.cfm
+https://www.webucator.com/how-to/harry-s-trumans-inaugural-address.cfm
+https://www.webucator.com/how-to/william-mckinleys-inaugural-address.cfm
+https://www.webucator.com/how-to/zachary-taylors-inaugural-address.cfm
+Note the contents of the addresses are in a div tag with the id 'content-main'.
+
+class q10():
+    
+    num_words = TextAnalyzer('https://www.webucator.com/how-to/george-bushs-inaugural-address.cfm', "url")
+    print ("The positivity rating for Bush's speech is: ", num_words.positivity)
+    bush_pos = num_words.positivity
+    
+    num_words = TextAnalyzer('https://www.webucator.com/how-to/harry-s-trumans-inaugural-address.cfm', "url")
+    print ("The positivity rating for Truman's speech is: ", num_words.positivity)
+    truman_pos = num_words.positivity
+    
+    num_words = TextAnalyzer('https://www.webucator.com/how-to/william-mckinleys-inaugural-address.cfm', "url")
+    print ("The positivity rating for Mckinley's speech is: ", num_words.positivity)
+    mckinley_pos = num_words.positivity
+    
+    num_words = TextAnalyzer('https://www.webucator.com/how-to/zachary-taylors-inaugural-address.cfm', "url")
+    print ("The positivity rating for Taylor's speech is: ", num_words.positivity)
+    taylor_pos = num_words.positivity
+    
+    if bush_pos < truman_pos and bush_pos < mckinley_pos and bush_pos < taylor_pos:
+        print("Bush's positivity rating is the lowest")
+    elif mckinley_pos < truman_pos and mckinley_pos < taylor_pos:
+            print("McKinley's positivity rating is the lowest")
+    elif truman_pos < taylor_pos:
+            print("Truman's positivity rating is the lowest")
+    else:
+        print("Taulor's positivity rating is the lowest")
+The positivity rating for Bush's speech is:  36
+The positivity rating for Truman's speech is:  44
+The positivity rating for Mckinley's speech is:  30
+The positivity rating for Taylor's speech is:  51
+McKinley's positivity rating is the lowest
