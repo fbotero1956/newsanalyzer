@@ -231,9 +231,9 @@ class TextAnalyzer():
                 wcounts.append(word)
                 self.distinct_word_count += 1
         #print("distinct word count = ", self.distinct_word_count)
-        tally = self.calculate_positivity_score()
+        self.tally = self.calculate_positivity_score()
         #print ("Tally = ", tally)
-        self.positivity = round(tally / self.word_count * 1000)
+        self.positivity = round(self.tally / self.word_count * 1000)
         #print("positivity index = ", self.positivity)
         self.reset_content()
         self._cwords = self.common_words()

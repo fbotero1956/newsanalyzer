@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [".herokuapp.com", "127.0.0.1", "localhost"]
 # Application definition
 
 INSTALLED_APPS = [
+    'newsanalyzer.apps.NewsanalyzerConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,7 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'accounts',
-    'newsanalyzer',
     'pages',
 ]
 

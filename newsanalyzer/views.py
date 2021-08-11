@@ -29,7 +29,7 @@ class ArticleDetailView(DetailView):
 class ArticleCreateView(CreateView):
     model = Article
     template_name = 'article_select.html'
-    fields = ('title', 'link', )
+    fields = ('title', 'description', )
     success_url = reverse_lazy('article_list')
 
 #   def form_valid(self, form):
@@ -46,8 +46,10 @@ headers = {
 
 class ReadRss:
  
-    def __init__(self, rss_url, headers):
+    def __init__(self, rss_url, headers, start, end):
  
+        self.ok = True
+        self.err = ""
         self.url = rss_url
         self.headers = headers
         try:
@@ -57,34 +59,51 @@ class ReadRss:
         except Exception as e:
             print('Error fetching the URL: ', rss_url)
             print(e)
+            self.ok=False
+            self.err='Error fetching the URL: '
+            return 
+
         print('self.status_code ', self)
         try:    
             self.soup = BeautifulSoup(self.r.text, 'html.parser')
         except Exception as e:
-            print('Could not parse the xml: ', self.url)
+            print('Could not parse the html: ', self.url)
             print(e)
+            self.ok=False
+            self.err='Could not parse the html: '
+            return 
 
         self.articles = self.soup.findAll('item')
         self.num_articles = len(self.articles)
+
         i = 0
         while i < self.num_articles:
             if self.articles[i] is None:
                 print("invalid index is " + str(i))
                 self.articles[i] = []
             i += 1
-        self.ten_articles = list(itertools.islice(self.articles,4))
+        self.ten_articles = list(itertools.islice(self.articles,start,end))
         self.articles = self.ten_articles
-        # print(self.num_articles)
+        print(self.num_articles)
         # print(len(self.articles))
         try:    
+            print('entering parsing routine')
             self.articles_dicts = [{'title':a.find('title').text,'link':a.link.next_sibling.replace('\n','').replace('\t',''),'description':a.find('description').text,'pubdate':a.find('pubdate').text} for a in self.articles]
+            print('dictionary successfully created')
             self.urls = [d['link'] for d in self.articles_dicts if 'link' in d]
+            print('urls successfully created')
             self.titles = [d['title'] for d in self.articles_dicts if 'title' in d]
+            print('title successfully created')
             self.descriptions = [d['description'] for d in self.articles_dicts if 'description' in d]
+            print('description successfully created')
             self.pub_dates = [d['pubdate'] for d in self.articles_dicts if 'pubdate' in d]
+            print('pub_date successfully created')
         except Exception as e:
-            print('Could not parse the article dictionary: ', self.articles)
+            # print('Could not parse the article dictionary: ', self.articles)
             print(e)
+            self.ok=False
+            self.err='Could not parse the article dictionary: '
+            return 
 
 
 
@@ -112,10 +131,21 @@ def rsscall(request):
    text = request.POST['text']
    # print('successful 1 ' + text)
    #Do whatever with the input variable text
-   feed = ReadRss(text, headers)
+   articles=Article.objects.all()
+   articles.delete()
+
+   start = 12
+   end = 21
+
+   total_word_count = 0
+   total_tally = 0
+   total_positivity = 0
+   
+
+   feed = ReadRss(text, headers, start, end)
    # Get list of urls in feed
    # print('successful 2')
-   if feed:
+   if feed.ok:
       print("found " + str(feed.num_articles) + " articles")
       # print list of urls in feed
       # print(feed.urls)
@@ -135,37 +165,53 @@ def rsscall(request):
       # print(len(feed.urls))
       
       i = 0
-      while i <= 3:
+      while i <= 8:
         print ("****************************")
         print ("****************************")
-        cwords = TextAnalyzer(feed.urls[i], "url")
-        print ("Title: ", feed.titles[i])
-        print ("URL to article: ", feed.urls[i])
-        print ("Date published: ", feed.pub_dates[i])
-        abstract = list(itertools.islice(feed.descriptions[i], 0, feed.descriptions[i].find('<')))
-        listToStr = ''.join([str(elem) for elem in abstract])
-        print ("Abstract: ", listToStr)
-        # print ("Abstract: ", feed.descriptions[i])
+        if feed.urls:
+            cwords = TextAnalyzer(feed.urls[i], "url")
+        
+            print ("Title: ", feed.titles[i])
+            print ("URL to article: ", feed.urls[i])
+            print ("Date published: ", feed.pub_dates[i])
+            abstract = list(itertools.islice(feed.descriptions[i], 0, feed.descriptions[i].find('<')))
+            listToStr = ''.join([str(elem) for elem in abstract])
+            print ("Abstract: ", listToStr)
+            # print ("Abstract: ", feed.descriptions[i])
 
 
-        response = feed.urls[0]
+            response = feed.urls[i]
 
-        if cwords.word_count > 0:
-            print ("The number of words in the article is: ", cwords.word_count)
-            print("distinct word count = ", cwords.distinct_word_count)
+            if cwords.word_count > 0:
+                print ("The number of words in the article is: ", cwords.word_count)
+                print("distinct word count = ", cwords.distinct_word_count)
 
-            common_words = cwords.common_words(minlen=5, maxlen=12)
-            for j in range(5):
-                print("The most common word of at least 5 letters in text is: ", common_words[j][0])
-            print ("average word length = ", cwords.avg_word_length)
-            positivity_score = cwords.calculate_positivity_score()
-            
-            print("The positivity score is: ", positivity_score)
-            print("The positivity index is: ", cwords.positivity)
+                common_words = cwords.common_words(minlen=5, maxlen=12)
+                for j in range(5):
+                    print("The most common word of at least 5 letters in text is: ", common_words[j][0])
+                print ("average word length = ", cwords.avg_word_length)
+                # positivity_score = cwords.calculate_positivity_score()
+                positivity_score = cwords.tally
+                
+                print("The positivity score is: ", positivity_score)
+                print("The positivity index is: ", cwords.positivity)
+
+                total_tally += cwords.tally
+                total_word_count += cwords.word_count
+
+                article = Article(title=feed.titles[i], link=feed.urls[i], date=feed.pub_dates[i], description=listToStr, word_count=cwords.word_count, positivity_index=cwords.positivity, record_type=1)
+                article.save()
         i += 1
-   else:
-       response = 'feed retrival failed'
-   #Send the response 
 
+
+   else:
+       response = feed.err
+   #Send the response 
+   total_positivity = round(total_tally / total_word_count * 1000)
+   print("Total number of words: ", total_word_count)
+   print("Total tally: ", total_tally)
+   print("Total positivity Index: ", total_positivity)
+   article = Article(title=text, description="Totals for the entire RSS feed", word_count=total_word_count, positivity_index=total_positivity, record_type=0)
+   article.save()
    return HttpResponse(response)
 
