@@ -13,6 +13,7 @@ from django.template import RequestContext
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .analyzer import TextAnalyzer
 import itertools
+from django.shortcuts import redirect
 
 
 class ArticleListView(ListView):
@@ -25,7 +26,10 @@ class ArticleListView(ListView):
 class ArticleDetailView(DetailView):
     model = Article
     template_name = 'article_detail.html'
-  
+
+def some_view(request):
+       return redirect(article.link)
+
 class ArticleCreateView(CreateView):
     model = Article
     template_name = 'article_select.html'

@@ -4,6 +4,7 @@ function myTest(){
 
  function getRSS(rss_url) {
     var text = rss_url;
+    document.getElementById("demo").innerHTML = "Feed analysis in progress, please wait...";
     console.log(text);
     var response = ""
     $.ajax({
@@ -13,7 +14,8 @@ function myTest(){
         success: function callback(response){
                    console.log('back in JS ');
                   // console.log(response);
-                  // alert(response);            
+                  // alert(response);    
+                  document.getElementById("demo").innerHTML = "Feed analysis successfully completed!";        
                 }
     });
     console.log(response)
