@@ -1,16 +1,18 @@
 {% extends 'base.html' %} 
 
-{% block title %}Article List{% endblock title %} 
+{% block title %}Articles List{% endblock title %} 
 
 {% block content %} 
-   <div class="container">
-      <h1>Article List</h1>
+   <div class="container main-body">
+      <h1>Articles List</h1>
       {% for article in object_list|dictsort:"record_type" %} 
       <div class="card">
-         <div class=card-header>
+         <div class="card-header">
+            {% if article.record_type > 0 %}
             <span class="font-weight-bold">
                   Title : 
             </span>
+            {% endif %}
             {{ article.title }}
 
             {% if article.record_type > 0 %}
@@ -25,21 +27,31 @@
                {{ article.description }}
                {% if article.record_type > 0 %}
                   <br>
-                  <a href="{{ article.link }}" target="_blank">Click here to see article</a>
+                  <a href="{{ article.link }}" target="_blank">Click here to see full article</a>
                {% endif %}
          </div>
-         <div class=card-header>
+         <div class="card-footer">
+            {% if article.record_type == 0 %}
+               <span class="font-weight-bold">
+                  Number of Articles : 
+               </span>
+               {{ article.num_articles }}
+               <br>
+            {% endif %}
             <span class="font-weight-bold">
                   Word Count : 
             </span>
             {{ article.word_count }}
-            <span class="fontpip3 freeze > requirements.txt
-               -weight-bold">
+            <br>
+            <span class="font-weight-bold">
                Positivity Index : 
             </span>
             {{ article.positivity_index }}
+            {% if article.record_type > 0 %}
+               <br>
+               <a class="blue" href="{% url 'article_detail' article.pk %}">See more stats...</a>
+            {% endif %}
          </div>
-         <br>
       </div>
       {% endfor %}
    </div>

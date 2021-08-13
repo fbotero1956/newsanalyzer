@@ -3,11 +3,22 @@
 {% block title %}Article Detail{% endblock title %} 
 
 {% block content %} 
-
-   <h1>Article Detail</h1>
-   <div class="container">
+   <div class="main-body container">
+      <h1>Article Detail</h1>
+      <div>
       <h2>{{ article.title }}</h2>
-      <a href="{{ article.link }}" target="_blank">Click here to see article</a>
+      <br>
+      <span class="font-weight-bold">
+            Word Count : 
+      </span>
+      {{ article.word_count }}
+      <br>
+      <span class="font-weight-bold">
+         Positivity Index : 
+      </span>
+      {{ article.positivity_index }}
+      <br>
+         <a href="{{ article.link }}" target="_blank">Click here to see article</a>
+      </div>
    </div>
-
 {% endblock content %} 

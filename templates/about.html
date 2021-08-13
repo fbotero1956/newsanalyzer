@@ -4,15 +4,16 @@
 {% block content %} 
    
      
-    <div class="post-entry container">
+    <div class="container main-body">
         <h1>About Me</h1>
         <p>This application was developed by Felipe Botero in 2021.  Use it for good!</p>
-        <img src="{% static 'img/FB.jpg' %}" alt="My image" style="width: 200px; height:200px;">
-        <img src="{% static 'img/got_stormy.jpg' %}" alt="My image" style="width: 200px; height:200px;">
+        <div class='image-div'>
+            <img src="{% static 'img/FB.jpg' %}" alt="My image" >
+            <img src="{% static 'img/got_stormy.jpg' %}" alt="got stormy" >
+        </div>
         <br>
         <p>Providing timely, accurate, objective and interesting news and perspectives is my passion.
         </p>
-        <h2><a href ="{% url 'home' %}">Home</a></h2>
     </div>
    
 {% endblock content %} 

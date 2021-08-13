@@ -242,4 +242,3 @@ class TextAnalyzer():
         self.reset_content()
         self._cchars= self.char_distribution()
         #self.plot_char_distribution()
-

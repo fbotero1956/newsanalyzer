@@ -228,4 +228,3 @@ def rsscall(request):
         article = Article(title=desc, description="Totals for the entire RSS feed", word_count=total_word_count, positivity_index=total_positivity, record_type=0, num_articles=end)
         article.save()
    return HttpResponse(response)
-

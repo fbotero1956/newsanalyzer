@@ -13,6 +13,7 @@ class Article(models.Model):
     word_count = models.IntegerField(null=True)
     positivity_index = models.IntegerField(null=True)
     record_type = models.IntegerField(null=True)
+    num_articles = models.IntegerField(null=True)
 
     def get_absolute_url(self):
         return reverse('article_detail', args=[int(self.id)])
