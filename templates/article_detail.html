@@ -14,11 +14,48 @@
       {{ article.word_count }}
       <br>
       <span class="font-weight-bold">
+            Distinct Word Count : 
+      </span>
+      {{ article.distinct_word_count }}
+      <br>
+      <span class="font-weight-bold">
+            Average Word Length : 
+      </span>
+      {{ article.avg_word_length }}
+      <br>
+      <span class="font-weight-bold">
+            Positive Word Count : 
+      </span>
+      {{ article.pos_tally }}
+      <br>
+      <span class="font-weight-bold">
+            Negative Word Count : 
+      </span>
+      {{ article.neg_tally }}
+      <br>
+      <span class="font-weight-bold">
          Positivity Index : 
       </span>
       {{ article.positivity_index }}
       <br>
-         <a href="{{ article.link }}" target="_blank">Click here to see article</a>
+      <span class="font-weight-bold">
+            Top most common words and frequency : 
+      </span>
+      <br>
+      {{ article.common_words_1 }} {{ article.common_words_tally_1 }}
+      <br>
+      {{ article.common_words_2 }} {{ article.common_words_tally_2 }}
+      <br>
+      {{ article.common_words_3 }} {{ article.common_words_tally_3 }}
+      <br>
+      {{ article.common_words_4 }} {{ article.common_words_tally_4 }}
+      <br>
+      {{ article.common_words_5 }} {{ article.common_words_tally_5 }}
+      <br>
+      <br>
+      <a href="{% url 'article_list' %}">Back to articles List</a>
+      <br>
+         <a href="{{ article.link }}" target="_blank">Click here to see the full article</a>
       </div>
    </div>
 {% endblock content %} 

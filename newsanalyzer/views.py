@@ -79,6 +79,9 @@ class ReadRss:
 
         self.articles = self.soup.findAll('item')
         self.num_articles = len(self.articles)
+        # limit the number of articles
+        #if self.num_articles <= end:
+        #    end = self.num_articles - 1
 
         i = 0
         while i < self.num_articles:
@@ -181,7 +184,7 @@ def rsscall(request):
         print ("****************************")
         print ("****************************")
         if feed.urls:
-            cwords = TextAnalyzer(feed.urls[i], "url")
+            cwords = TextAnalyzer(desc, feed.urls[i], "url")
         
             print ("Title: ", feed.titles[i])
             print ("URL to article: ", feed.urls[i])
@@ -200,7 +203,7 @@ def rsscall(request):
 
                 common_words = cwords.common_words(minlen=5, maxlen=12)
                 for j in range(5):
-                    print("The most common word of at least 5 letters in text is: ", common_words[j][0])
+                    print("The most common word of at least 5 letters in text is: ", common_words[j][0], "   ", common_words[j][1])
                 print ("average word length = ", cwords.avg_word_length)
                 # positivity_score = cwords.calculate_positivity_score()
                 positivity_score = cwords.tally
@@ -211,7 +214,9 @@ def rsscall(request):
                 total_tally += cwords.tally
                 total_word_count += cwords.word_count
 
-                article = Article(title=feed.titles[i], link=feed.urls[i], date=feed.pub_dates[i], description=listToStr, word_count=cwords.word_count, positivity_index=cwords.positivity, record_type=1)
+
+                article = Article(title=feed.titles[i], link=feed.urls[i], date=feed.pub_dates[i], description=listToStr, word_count=cwords.word_count, positivity_index=cwords.positivity, record_type=1, distinct_word_count=cwords.distinct_word_count, avg_word_length=cwords.avg_word_length, common_words_1=common_words[0][0], common_words_tally_1=common_words[0][1], common_words_2=common_words[1][0], common_words_tally_2=common_words[1][1], common_words_3=common_words[2][0], common_words_tally_3=common_words[2][1], common_words_4=common_words[3][0], common_words_tally_4=common_words[3][1], common_words_5=common_words[4][0], common_words_tally_5=common_words[4][1], pos_tally=cwords.pos_tally, neg_tally=cwords.neg_tally, )
+        
                 article.save()
                 end += 1
         i += 1

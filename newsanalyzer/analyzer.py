@@ -77,7 +77,7 @@ class TextAnalyzer():
                 return d_src_type
     
     #sets _content to the text within the "tag" html element
-    def set_content_to_tag(self, tag, tag_id=None):
+    def set_content_to_tag(self, tag, tag_id=None, content_tag=None):
         response = urlopen(self._src).read()
         
         soup = BeautifulSoup(response, 'html.parser')
@@ -85,7 +85,22 @@ class TextAnalyzer():
         txt = soup.find(id=tag)
         self._orig_content = str(txt) 
         # print(self._orig_content)
-        txt = soup.find_all("div", "zn-body__paragraph")
+        txt = soup.find_all( tag, tag_id)
+        for t in txt:
+         self._content += str(txt)
+        # print("content = ", self._content)
+        return 
+
+        #sets _content to the text within the "tag" html element
+    def set_MWcontent_to_tag(self, tag, tag_id=None, content_tag=None):
+        response = urlopen(self._src).read()
+        
+        soup = BeautifulSoup(response, 'html.parser')
+        print(soup.title)
+        txt = soup.find(tag, tag_id)
+        self._orig_content = str(txt) 
+        # print(self._orig_content)
+        txt = soup.find_all(content_tag)
         for t in txt:
          self._content += str(txt)
         # print("content = ", self._content)
@@ -161,10 +176,12 @@ class TextAnalyzer():
                     tallyNeg += 1
         print("tallyPos: ", tallyPos)
         print("tallyNeg: ", tallyNeg)
+        self.pos_tally = tallyPos
+        self.neg_tally = tallyNeg
         return tally
 
         
-    def __init__(self, src, src_type='none'):
+    def __init__(self, desc, src, src_type='none'):
         #src_type will specify discover, url, path, text
         #validate src to start with http and end with txtig_content
         #print ('First step', src_type)
@@ -199,8 +216,18 @@ class TextAnalyzer():
             self._orig_content = self._content
         elif self._src_type == "url":
             self._content = ""
+            #
             # may need to vary this line based on rss feed
-            self.set_content_to_tag(tag="div", tag_id="zn-body__paragraph")
+            #
+            if desc == 'CNN Top Political Stories RSS':
+               self.set_content_to_tag(tag="div", tag_id="zn-body__paragraph", content_tag='p')
+
+            if desc == 'CNN Top Stories RSS':
+               self.set_content_to_tag(tag="div", tag_id="zn-body__paragraph", content_tag='p')
+
+            if desc == 'MarketWatch Top Stories RSS':
+               self.set_MWcontent_to_tag(tag="div", tag_id="js-article-body", content_tag='p')
+
             # print("here is the content:")
             # print(self._content)
             self._orig_content = self._content

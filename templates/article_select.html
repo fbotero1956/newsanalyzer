@@ -7,9 +7,13 @@
       <h1>Select RSS Feed</h1>
       <p class="instructions">Please select a news feed to analyze, from those listed below:</p>
       <div class="container">
-         <button class="btn btn-large btn-primary"  disabled type="button" onclick="getRSS('http://rss.cnn.com/rss/cnn_topstories.rss')">CNN Top Stories RSS</button>
-         <button class="btn btn-large btn-primary" disabled type="button" onclick="getRSS('http://rss.cnn.com/rss/money_latest.rss')">CNN Top Financial Stories RSS</button>
+         <button class="btn btn-large btn-primary" type="button" onclick="getRSS('http://rss.cnn.com/rss/cnn_topstories.rss', 'CNN Top Stories RSS')">CNN Top Stories RSS</button>
          <button class="btn btn-large btn-primary" type="button" onclick="getRSS('http://rss.cnn.com/rss/cnn_allpolitics.rss', 'CNN Top Political Stories RSS')">CNN Top Political Stories RSS</button>
+         <button class="btn btn-large btn-primary" type="button" onclick="getRSS('http://feeds.marketwatch.com/marketwatch/topstories/', 'MarketWatch Top Stories RSS')">MarketWatch Top Stories RSS</button>
+         <button class="btn btn-large btn-primary" disabled type="button" onclick="getRSS('http://rss.cnn.com/rss/money_latest.rss')">Placeholder</button>
+         <button class="btn btn-large btn-primary" disabled type="button" onclick="getRSS('http://rss.cnn.com/rss/money_latest.rss')">Placeholder</button>
+         <br>
+         <a href="{% url 'article_list' %}">View results in articles list</a>
       </div>
    </div>
 {% endblock content %}  

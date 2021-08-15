@@ -23,8 +23,7 @@ h1 {
     margin: 20px;
 }
 .instructions {
-    margin-left:2px;
-    margin-right: 2px;
+    margin: 5px;
 }
 .main-body{
     background: rgb(34,195,188);
@@ -45,6 +44,14 @@ h1 {
     grid-template-columns: 1fr 1fr;
     grid-gap: 2px;
     padding: 5px;
-
-
+}
+@media (max-width: 600px){
+    .image-div{
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-gap: 2px;
+        padding: 5px;
+        position: relative;
+        margin-left: 30px;
+    }
 }
