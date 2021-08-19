@@ -189,7 +189,11 @@ def rsscall(request):
             print ("Title: ", feed.titles[i])
             print ("URL to article: ", feed.urls[i])
             print ("Date published: ", feed.pub_dates[i])
-            abstract = list(itertools.islice(feed.descriptions[i], 0, feed.descriptions[i].find('<')))
+            print (feed.descriptions[i])
+            if desc != 'CNBC Market Insider':
+                abstract = list(itertools.islice(feed.descriptions[i], 0, feed.descriptions[i].find('<')))
+            else:
+                abstract = list(itertools.islice(feed.descriptions[i], 0, len(feed.descriptions[i])))
             listToStr = ''.join([str(elem) for elem in abstract])
             print ("Abstract: ", listToStr)
             # print ("Abstract: ", feed.descriptions[i])

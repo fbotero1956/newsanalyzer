@@ -128,7 +128,7 @@ class TextAnalyzer():
         words = self._words(casesensitive=casesensitive)
 
         for word in words:
-            if len(word) >= minlen and len(word) <= maxlen:
+            if len(word) >= minlen and len(word) <= maxlen and word.isalpha():
                 if word in counts:
                     counts[word] += 1
                 else:
@@ -224,6 +224,9 @@ class TextAnalyzer():
 
             if desc == 'CNN Top Stories RSS':
                self.set_content_to_tag(tag="div", tag_id="zn-body__paragraph", content_tag='p')
+
+            if desc == 'CNBC Market Insider':
+               self.set_MWcontent_to_tag(tag="div", tag_id="ArticleBody-articleBody", content_tag='p')
 
             if desc == 'MarketWatch Top Stories RSS':
                self.set_MWcontent_to_tag(tag="div", tag_id="js-article-body", content_tag='p')

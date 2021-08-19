@@ -23,6 +23,7 @@
       </span>
       {{ article.avg_word_length }}
       <br>
+      <br>
       <span class="font-weight-bold">
             Positive Word Count : 
       </span>
@@ -38,21 +39,47 @@
       </span>
       {{ article.positivity_index }}
       <br>
+      <br>
       <span class="font-weight-bold">
-            Top most common words and frequency : 
+            Top 5 most common words and frequency : 
       </span>
       <br>
-      {{ article.common_words_1 }} {{ article.common_words_tally_1 }}
-      <br>
-      {{ article.common_words_2 }} {{ article.common_words_tally_2 }}
-      <br>
-      {{ article.common_words_3 }} {{ article.common_words_tally_3 }}
-      <br>
-      {{ article.common_words_4 }} {{ article.common_words_tally_4 }}
-      <br>
-      {{ article.common_words_5 }} {{ article.common_words_tally_5 }}
-      <br>
-      <br>
+      <table class="table table-primary">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Word</th>
+                <th scope="col">Frequency</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">1</th>
+                <td>{{ article.common_words_1 }}</td>
+                <td>{{ article.common_words_tally_1 }}</td>
+              </tr>
+              <tr>  
+                <th scope="row">2</th>
+                <td>{{ article.common_words_2 }}</td>
+                <td>{{ article.common_words_tally_2 }}</td>
+              </tr>
+              <tr>
+                 <th scope="row">3</th>
+                  <td>{{ article.common_words_3 }}</td>
+                  <td>{{ article.common_words_tally_3 }}</td>
+              </tr>
+              <tr>
+                  <th scope="row">4</th>
+                  <td>{{ article.common_words_4 }}</td>
+                  <td>{{ article.common_words_tally_4 }}</td>
+              </tr>
+              <tr>
+                  <th scope="row">5</th>
+                  <td>{{ article.common_words_5 }}</td>
+                  <td>{{ article.common_words_tally_5 }}</td>
+              </tr>
+            </tbody>
+          </table>
       <a href="{% url 'article_list' %}">Back to articles List</a>
       <br>
          <a href="{{ article.link }}" target="_blank">Click here to see the full article</a>

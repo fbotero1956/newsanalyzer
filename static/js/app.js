@@ -7,17 +7,16 @@ function myTest(){
     var desc = rss_desc;
     document.getElementById("demo").innerHTML = "Feed analysis in progress, please wait...";
     console.log(text);
-    var response = ""
+    var response = "";
     $.ajax({
         type: "POST",
         url: 'my-ajax-test/',
         data: {addcsrfmiddlewaretoken: '{{ csrf_token }}', text: text, desc: desc, },  
         success: function callback(response){
-                   console.log('back in JS ');
-                  // console.log(response);
-                  // alert(response);    
-                  document.getElementById("demo").innerHTML = "Feed analysis successfully completed!";        
+                  console.log('back in JS ');  
+                  document.getElementById("demo").innerHTML = "Feed analysis successfully completed!";  
+    
                 }
     });
-    console.log(response)
+    console.log(response);
 }
