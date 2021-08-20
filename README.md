@@ -11,3 +11,7 @@ Personas - Two personas will be considered, a technology savvy person and one th
 Architecture – The application will be a full stack application using a Python back-end and authentication, with a database to store the articles that have been analyzed and the results of the analysis.
 
 RSS Feed - the code to get the RSS feed came from jcchouinard.com
+
+Heroku link: https://newaanalyzer.herokuapp.com/
+
+github link:  https://github.com/fbotero1956/newsanalyzer
