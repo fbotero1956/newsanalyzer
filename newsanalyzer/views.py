@@ -147,7 +147,7 @@ def rsscall(request):
    articles.delete()
 
    start = 0
-   end = 21
+   end = 9
 
    total_word_count = 0
    total_tally = 0
