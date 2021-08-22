@@ -9,6 +9,7 @@ h1 {
 }
 #demo {
     color: white;
+    font-weight: 800;
     animation-name: message;
     animation-duration: 3s;
     animation-iteration-count: 7;
