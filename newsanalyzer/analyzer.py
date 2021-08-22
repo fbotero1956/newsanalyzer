@@ -231,6 +231,8 @@ class TextAnalyzer():
             if desc == 'MarketWatch Top Stories RSS':
                self.set_MWcontent_to_tag(tag="div", tag_id="js-article-body", content_tag='p')
 
+            if desc == 'FOX News World':
+               self.set_MWcontent_to_tag(tag="div", tag_id="article-body", content_tag='p')
             # print("here is the content:")
             # print(self._content)
             self._orig_content = self._content
