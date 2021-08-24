@@ -35,3 +35,16 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+class History(models.Model): 
+    title = models.CharField(max_length=255, null=True)
+    date = models.CharField(max_length=255, null=True)
+    word_count = models.IntegerField(null=True)
+    positivity_index = models.IntegerField(null=True)
+    num_articles = models.IntegerField(null=True)
+
+    def get_absolute_url(self):
+        return reverse('article_history', args=[int(self.id)])
+            
+    def __str__(self):
+        return self.title
+

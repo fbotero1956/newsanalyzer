@@ -1,0 +1,33 @@
+{% extends 'base.html' %} 
+
+{% block title %}History of Feeds Analyzed{% endblock title %} 
+
+{% block content %} 
+   <div class="container main-body">
+      <h1>History of Feeds Analyzed</h1>
+        <div>
+         <table class="table table-primary">
+            <thead>
+              <tr>
+                <th scope="col">Feed Title</th>
+                <th scope="col">Date Run</th>
+                <th scope="col">Number Articles</th>
+                <th scope="col">Number Words</th>
+                <th scope="col">Positivity Index</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for history in object_list|dictsort:"title" %} 
+              <tr>
+                <td>{{ history.title }}</td>
+                <td>{{ history.date }}</td>
+                <td>{{ history.num_articles }}</td>
+                <td>{{ history.word_count }}</td>
+                <td>{{ history.positivity_index }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+   </div>   
+{% endblock content %} 

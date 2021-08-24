@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView
-from .models import Article 
+from .models import Article, History
 from bs4 import BeautifulSoup
 import requests
 from django.http import HttpResponse
@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .analyzer import TextAnalyzer
 import itertools
 from django.shortcuts import redirect
+from datetime import datetime
 
 
 class ArticleListView(ListView):
@@ -22,7 +23,11 @@ class ArticleListView(ListView):
 
     def getRSS(RSS_URL):
         feed = ReadRss(RSS_URL, headers)
-   
+
+class ArticleHistoryView(ListView):
+    model = History
+    template_name = 'article_history.html'
+
 class ArticleDetailView(DetailView):
     model = Article
     template_name = 'article_detail.html'
@@ -236,5 +241,11 @@ def rsscall(request):
         print("Total positivity Index: ", total_positivity)
         article = Article(title=desc, description="Totals for the entire RSS feed", word_count=total_word_count, positivity_index=total_positivity, record_type=0, num_articles=end)
         article.save()
+        #
+        # save history
+        #
+        run_date = datetime.now()
+        history = History(title=desc, word_count=total_word_count, date=run_date, positivity_index=total_positivity, num_articles=end)
+        history.save()
    return HttpResponse(response)
 
