@@ -5,6 +5,8 @@
 {% block content %} 
    <div class="container main-body">
       <h1>History of Feeds Analyzed</h1>
+      <button class="btn btn-primary" name="plotter" type='submit' onclick="location.href='{% url "history_plotter" %}'">Feed History Graph</button>
+
         <div>
          <table class="table table-primary">
             <thead>

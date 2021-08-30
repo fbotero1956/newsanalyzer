@@ -1,0 +1,15 @@
+{% extends 'base.html' %} 
+
+{% block title %}Feed History Positivity Index Graph{% endblock title %} 
+
+{% block content %} 
+   <div class="main-body container">
+      <h1>Feed History Index Chart</h1>
+      <div class='graph-div'>
+         {% for feed in data  %}
+            <img class="graph" src="{% url 'history_plotter_graph' feed=feed %}" alt="Graph image">
+            <br>
+         {% endfor %}
+      </div>
+   </div>
+{% endblock content %} 

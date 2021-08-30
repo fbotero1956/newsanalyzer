@@ -15,6 +15,15 @@ from .analyzer import TextAnalyzer
 import itertools
 from django.shortcuts import redirect
 from datetime import datetime
+import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt1
+import io 
+import urllib, base64
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.figure import Figure
+from threading import RLock
+
+thread_control = RLock()
 
 
 class ArticleListView(ListView):
@@ -27,6 +36,88 @@ class ArticleListView(ListView):
 class ArticleHistoryView(ListView):
     model = History
     template_name = 'article_history.html'
+
+class FeedHistoryView(DetailView):
+    model = History
+    template_name = 'feed_history.html'
+
+def history_plotter(request):
+        #plot the most common words
+
+    history = History.objects.all()
+    print("in plotter function")
+    feeds = []
+    for a in history:
+        if a.title not in feeds:
+            feeds.append(a.title)
+
+    feeds_dict = {feeds[i]: i for i in range(0, len(feeds))}
+
+    return render(request, 'feed_history.html', {'data' :  feeds_dict})
+
+
+def history_plotter_graph(request, feed="CNN Top Political Stories RSS"):
+   
+    # matplotlib needs thread synchronization
+
+    with thread_control:
+
+        history = History.objects.all()
+        print("in graph function", feed)
+        
+        char = []
+        count = []
+        run = 0
+        for a in history:
+            if a.title == feed:
+                run += 1
+                char.append(run)
+                count.append(a.positivity_index)
+        #fig = plt.subplots(2,3)
+        
+        f = plt.figure(figsize=(4,3), edgecolor='red')
+        plt.title(feed)
+        plt.xlabel('Run')
+        plt.ylabel('Index')
+        #plt.xticks(rotation='vertical')
+        # bar1 = plt.plot(h, color='Green',alpha=0.65)
+        plt.bar(char, count)
+        canvas = FigureCanvasAgg(f)    
+        response = HttpResponse(content_type='image/jpg')
+        canvas.print_jpg(response)
+        plt.close(f)
+        return response
+
+def history_plotter_graph_saved(request, feed):
+        #plot the most common words
+
+    history = History.objects.all()
+ 
+    
+    char = []
+    count = []
+    run = 0
+    for a in history:
+        if a.title == feed:
+           run += 1
+           char.append(run)
+           count.append(a.positivity_index)
+    #fig = plt.subplots(2,3)
+    plt.bar(char, count)
+    plt.title(feed[0])
+    plt.xlabel("Run")
+    plt.ylabel("Index")
+    #plt.show()
+    
+    fig = plt.gcf()
+    #convert graph into string buffer, then 64 bit code into png image
+    buf = io.BytesIO()
+    fig.savefig(buf,format='png')
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri = urllib.parse.quote(string)
+
+    return uri
 
 class ArticleDetailView(DetailView):
     model = Article
@@ -247,5 +338,7 @@ def rsscall(request):
         run_date = datetime.now()
         history = History(title=desc, word_count=total_word_count, date=run_date, positivity_index=total_positivity, num_articles=end)
         history.save()
+   else:
+        response = feed.err
    return HttpResponse(response)
 
