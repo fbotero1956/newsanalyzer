@@ -4,7 +4,7 @@
 
 {% block content %} 
    <div class="container main-body">
-      <h1>History of Feeds Analyzed</h1>
+      <h1>Detail of Feeds Analyzed</h1>
       <div class="sort-buttons">
         <button class="btn btn-primary plotter" name="plotter" type='submit' onclick="location.href='{% url "history_plotter" %}'">Positivity Index Graphs</button>
 
@@ -21,7 +21,7 @@
               </tr>
             </thead>
             <tbody>
-                {% for history in object_list|dictsort:'title' %} 
+                {% for history in object_list|dictsort:'date' %} 
               <tr>
                 <td>{{ history.title }}</td>
                 <td>{{ history.date }}</td>

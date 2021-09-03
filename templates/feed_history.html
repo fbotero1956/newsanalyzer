@@ -4,12 +4,14 @@
 
 {% block content %} 
    <div class="main-body container">
-      <h1>Feed History Index Chart</h1>
+      <h1>Feed History Positivity Index Charts</h1>
+      <h3>View the detail data behind each graph by clicking anywhere within the graph.</h3>
       <div class='graph-div'>
          {% for feed in data  %}
+         <a class="nav-link active" href="{% url 'single_feed_history' feed=feed %}">
             <img class="graph" src="{% url 'history_plotter_graph' feed=feed %}" alt="Graph image">
-            <br>
-         {% endfor %}
+         </a>
+            {% endfor %}
       </div>
    </div>
 {% endblock content %} 

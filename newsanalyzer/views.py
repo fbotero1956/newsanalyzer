@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView
-from .models import Article, History
+from .models import Article, History, Single_history
 from bs4 import BeautifulSoup
 import requests
 from django.http import HttpResponse
@@ -37,9 +37,9 @@ class ArticleHistoryView(ListView):
     model = History
     template_name = 'article_history.html'
 
-class FeedHistoryView(DetailView):
-    model = History
-    template_name = 'feed_history.html'
+class FeedHistoryView(ListView):
+    model = Single_history
+    template_name = 'single_feed_history.html'
 
 def history_plotter(request):
         #plot the most common words
@@ -74,50 +74,50 @@ def history_plotter_graph(request, feed="CNN Top Political Stories RSS"):
                 char.append(run)
                 count.append(a.positivity_index)
         #fig = plt.subplots(2,3)
+        plt.tight_layout()
+        f = plt.figure(figsize=(3,3), edgecolor='red')
         
-        f = plt.figure(figsize=(4,3), edgecolor='red')
         plt.title(feed)
         plt.xlabel('Run')
         plt.ylabel('Index')
+        plt.tight_layout()
+        
         #plt.xticks(rotation='vertical')
         # bar1 = plt.plot(h, color='Green',alpha=0.65)
         plt.bar(char, count)
+        #plt.savefig(f, bbox_inches='tight')
         canvas = FigureCanvasAgg(f)    
         response = HttpResponse(content_type='image/jpg')
         canvas.print_jpg(response)
         plt.close(f)
         return response
 
-def history_plotter_graph_saved(request, feed):
-        #plot the most common words
+def single_feed_history(request, feed="CNN Top Political Stories RSS"):
+   
+    # matplotlib needs thread synchronization
 
-    history = History.objects.all()
- 
-    
-    char = []
-    count = []
-    run = 0
-    for a in history:
-        if a.title == feed:
-           run += 1
-           char.append(run)
-           count.append(a.positivity_index)
-    #fig = plt.subplots(2,3)
-    plt.bar(char, count)
-    plt.title(feed[0])
-    plt.xlabel("Run")
-    plt.ylabel("Index")
-    #plt.show()
-    
-    fig = plt.gcf()
-    #convert graph into string buffer, then 64 bit code into png image
-    buf = io.BytesIO()
-    fig.savefig(buf,format='png')
-    buf.seek(0)
-    string = base64.b64encode(buf.read())
-    uri = urllib.parse.quote(string)
+    with thread_control:
 
-    return uri
+        history = History.objects.all()
+        print("in single feed history function", feed)
+        
+        single_hst = Single_history.objects.all()
+        single_hst.delete()
+
+        run = 0
+        for a in history:
+            if a.title == feed:
+                run += 1
+                single_hst = Single_history(title=a.title, word_count=a.word_count, date=a.date, positivity_index=a.positivity_index, num_articles=a.num_articles)
+
+                single_hst.save()
+                
+
+        response = redirect('/newsanalyzer/single_feed_history/')
+        return response
+        #return render(request, 'single_feed_history.html' )
+        #return HttpResponse(response)
+
 
 class ArticleDetailView(DetailView):
     model = Article

@@ -1,6 +1,10 @@
 h1 {
-    color: red;
-    margin: 10px;
+    color: blue;
+    margin: 1px;
+    text-align: center;
+}
+h3 {
+    margin:10px;
     text-align: center;
 }
 @keyframes message {
@@ -55,24 +59,28 @@ h1 {
         position: relative;
         margin-left: 30px;
     }
+}
 .graph-div{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: 2px;
-    padding: 5px;
-    background-color: yellow;
+    grid-gap: 10px;
+    padding: 10px;
+    margin: 5px;
 }
 @media (max-width: 600px){
     .graph-div{
         display: grid;
         grid-template-columns: 1fr;
-        grid-gap: 2px;
-        padding: 5px;
-        position: relative;
-        margin-left: 30px;
+        
     }
 }
 .graph {
-    width:300px;
-    height:200px;
+    width:600px;
+    height:300px;
+}
+.plotter{
+    max-width: 125px;
+}
+.sort-buttons{
+    display: flex;
 }

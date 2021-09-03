@@ -1,4 +1,4 @@
-{% load static %}
+
 <html>
     <head>
         <meta charset="utf-8">
@@ -25,14 +25,16 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="{% url 'article_list' %}">View Results</a>
+                <a class="nav-link active" href="{% url 'article_list' %}">Articles List</a>
               </li>
+
               <li class="nav-item">
-                <a class="nav-link active" href="{% url 'history_plotter' %}">Historical Graphs
+                <a class="nav-link active" href="{% url 'article_history' %}">Feed History
                 </a>
               </li>
+              
               <li class="nav-item">
-                <a class="nav-link active" href="{% url 'about' %}">About Us</a>
+                <a class="nav-link active" href="{% url 'about' %}">About</a>
               </li>
               <li class="nav-item dropdown">
                {% if user.is_authenticated %} 
