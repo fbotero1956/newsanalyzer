@@ -25,22 +25,30 @@ from threading import RLock
 
 thread_control = RLock()
 
-
+#
+#To display the results of the feed analysis
+#
 class ArticleListView(ListView):
     model = Article
     template_name = 'article_list.html'
 
     def getRSS(RSS_URL):
         feed = ReadRss(RSS_URL, headers)
-
+#
+#Not in use
+#
 class ArticleHistoryView(ListView):
     model = History
     template_name = 'article_history.html'
-
+#
+#To display the history details of a specific feed
+#
 class FeedHistoryView(ListView):
     model = Single_history
     template_name = 'single_feed_history.html'
-
+#
+#Creates a list of the individual feeds, which is used to drive #the graph creation process
+#
 def history_plotter(request):
         #plot the most common words
 
@@ -55,7 +63,9 @@ def history_plotter(request):
 
     return render(request, 'feed_history.html', {'data' :  feeds_dict})
 
-
+#
+#Creates the feed history graphs for each feed
+#
 def history_plotter_graph(request, feed="CNN Top Political Stories RSS"):
    
     # matplotlib needs thread synchronization
@@ -91,7 +101,9 @@ def history_plotter_graph(request, feed="CNN Top Political Stories RSS"):
         canvas.print_jpg(response)
         plt.close(f)
         return response
-
+#
+#Creates the temporary database with the feed history for th selected feed
+#
 def single_feed_history(request, feed="CNN Top Political Stories RSS"):
    
     # matplotlib needs thread synchronization
@@ -115,35 +127,42 @@ def single_feed_history(request, feed="CNN Top Political Stories RSS"):
 
         response = redirect('/newsanalyzer/single_feed_history/')
         return response
-        #return render(request, 'single_feed_history.html' )
-        #return HttpResponse(response)
 
-
+#
+#Displays the detail statistics for a particular article after analysis
+#
 class ArticleDetailView(DetailView):
     model = Article
     template_name = 'article_detail.html'
 
 def some_view(request):
        return redirect(article.link)
-
+#
+#allows the user to select an RSS feed to analyze
+#
 class ArticleCreateView(CreateView):
     model = Article
     template_name = 'article_select.html'
     fields = ('title', 'description', )
     success_url = reverse_lazy('article_list')
-
-#   def form_valid(self, form):
-#        form.instance.author = self.request.user
-#        return super().form_valid(form)
-
+#
+#displays the about us view
+#
 class ArticleAboutView(ListView):
     model = Article
     template_name = "about.html"
 
+#
+#user agent needed for the RSS url get
+#
 headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
-
+#
+# gets the RSS feed and parses it (using beautifulsoup4) for the analyzer to use
+#start and end enable control over the number of articles to process
+#Heroku has a 30 second thread limit and so a limit of 5 articles has been set
+#
 class ReadRss:
  
     def __init__(self, rss_url, headers, start, end):
@@ -190,20 +209,20 @@ class ReadRss:
             self.ten_articles = list(itertools.islice(self.articles,start,end))
             self.articles = self.ten_articles
             self.num_articles = len(self.articles)
-            print(self.num_articles)
+            #print(self.num_articles)
 
             try:    
-                print('entering parsing routine')
+                #print('entering parsing routine')
                 self.articles_dicts = [{'title':a.find('title').text,'link':a.link.next_sibling.replace('\n','').replace('\t',''),'description':a.find('description').text,'pubdate':a.find('pubdate').text} for a in self.articles]
-                print('dictionary successfully created')
+                #print('dictionary successfully created')
                 self.urls = [d['link'] for d in self.articles_dicts if 'link' in d]
-                print('urls successfully created')
+                #print('urls successfully created')
                 self.titles = [d['title'] for d in self.articles_dicts if 'title' in d]
-                print('title successfully created')
+                #print('title successfully created')
                 self.descriptions = [d['description'] for d in self.articles_dicts if 'description' in d]
-                print('description successfully created')
+                #print('description successfully created')
                 self.pub_dates = [d['pubdate'] for d in self.articles_dicts if 'pubdate' in d]
-                print('pub_date successfully created')
+                #print('pub_date successfully created')
             except Exception as e:
                 # print('Could not parse the article dictionary: ', self.articles)
                 print(e)
@@ -231,7 +250,10 @@ class ReadRss:
         # Show publication dates
         print(feed.pub_dates)
 
-
+#
+#instantiates the class to get the feed and articles
+#executes the analyzer on each article and writes the results 
+#
 @csrf_exempt
 def rsscall(request):
    #Get the variable text
@@ -254,62 +276,46 @@ def rsscall(request):
    # Get list of urls in feed
    # print('successful 2')
    if feed.ok:
-      print("found " + str(feed.num_articles) + " articles")
-      # print list of urls in feed
-      # print(feed.urls)
-              
-      # print article data as a list of dicts
-      # print(feed.articles_dicts)
- 
-      # Show article titles
-      # print(feed.titles)
-        
-      # Show descriptions
-      # print(feed.descriptions)
-        
-      # Show publication dates
-      # print(feed.pub_dates)
+      #print("found " + str(feed.num_articles) + " articles")
 
-      # print(len(feed.urls))
-      
       i = 0
-      print('length of feed', len(feed.urls))
-      print ('end :', end)
+      #print('length of feed', len(feed.urls))
+      #print ('end :', end)
       end = 0
       while i <= len(feed.urls) - 1:
-        print ("****************************")
-        print ("****************************")
+        #print ("****************************")
+        #print ("****************************")
         if feed.urls:
             cwords = TextAnalyzer(desc, feed.urls[i], "url")
         
-            print ("Title: ", feed.titles[i])
-            print ("URL to article: ", feed.urls[i])
-            print ("Date published: ", feed.pub_dates[i])
-            print (feed.descriptions[i])
+            #print ("Title: ", feed.titles[i])
+            #print ("URL to article: ", feed.urls[i])
+            #print ("Date published: ", feed.pub_dates[i])
+            #print (feed.descriptions[i])
             if desc != 'CNBC Market Insider':
                 abstract = list(itertools.islice(feed.descriptions[i], 0, feed.descriptions[i].find('<')))
             else:
                 abstract = list(itertools.islice(feed.descriptions[i], 0, len(feed.descriptions[i])))
             listToStr = ''.join([str(elem) for elem in abstract])
-            print ("Abstract: ", listToStr)
+            #print ("Abstract: ", listToStr)
             # print ("Abstract: ", feed.descriptions[i])
 
 
             response = feed.urls[i]
 
             if cwords.word_count > 0:
-                print ("The number of words in the article is: ", cwords.word_count)
-                print("distinct word count = ", cwords.distinct_word_count)
+                #print ("The number of words in the article is: ", cwords.word_count)
+                #print("distinct word count = ", cwords.distinct_word_count)
 
                 common_words = cwords.common_words(minlen=5, maxlen=12)
                 for j in range(5):
                     print("The most common word of at least 5 letters in text is: ", common_words[j][0], "   ", common_words[j][1])
-                print ("average word length = ", cwords.avg_word_length)
-                # positivity_score = cwords.calculate_positivity_score()
+                #print ("average word length = ", cwords.avg_word_length)
+
                 positivity_score = cwords.tally
                 
-                print("The positivity score is: ", positivity_score)
-                print("The positivity index is: ", cwords.positivity)
+                #print("The positivity score is: ", positivity_score)
+                #print("The positivity index is: ", cwords.positivity)
 
                 total_tally += cwords.tally
                 total_word_count += cwords.word_count
@@ -327,13 +333,16 @@ def rsscall(request):
    #Send the response 
    if total_word_count > 0:
         total_positivity = round(total_tally / total_word_count * 1000)
-        print("Total number of words: ", total_word_count)
-        print("Total tally: ", total_tally)
-        print("Total positivity Index: ", total_positivity)
+        #print("Total number of words: ", total_word_count)
+        #print("Total tally: ", total_tally)
+        #print("Total positivity Index: ", total_positivity)
+        #
+        #write feed level stats
+        #
         article = Article(title=desc, description="Totals for the entire RSS feed", word_count=total_word_count, positivity_index=total_positivity, record_type=0, num_articles=end)
         article.save()
         #
-        # save history
+        # save feed history
         #
         run_date = datetime.now()
         history = History(title=desc, word_count=total_word_count, date=run_date, positivity_index=total_positivity, num_articles=end)

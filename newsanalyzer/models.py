@@ -1,9 +1,14 @@
 from django.db import models
 
-# Create your models here.
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
+
+#
+#The Article model is used to hold the results of the analyzer
+#A rowis written for each article analyzed and one for the overall results at the feed level
+#The database is cleared prior to begining a new run
+#
 
 class Article(models.Model): 
     title = models.CharField(max_length=255, null=True)
@@ -34,7 +39,10 @@ class Article(models.Model):
             
     def __str__(self):
         return self.title
-
+#
+#The History model contains a summary of the results of each analysis run at the feed level
+#The data is persistent and can be viewed via the graphical representation and the feed detail pages
+#
 class History(models.Model): 
     title = models.CharField(max_length=255, null=True)
     date = models.CharField(max_length=255, null=True)
@@ -47,7 +55,10 @@ class History(models.Model):
             
     def __str__(self):
         return self.title
-
+#
+#The Single_history model is used for display purposes and is a temporary storage area
+#It is loaded once a graph is selected via click and the data is then displayed in the listview
+#
 class Single_history(models.Model): 
     title = models.CharField(max_length=255, null=True)
     date = models.CharField(max_length=255, null=True)

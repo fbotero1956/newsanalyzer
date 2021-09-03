@@ -21,7 +21,7 @@
               </tr>
             </thead>
             <tbody>
-                {% for history in object_list|dictsort:'date' %} 
+                {% for history in object_list|dictsortreversed:'date' %} 
               <tr>
                 <td>{{ history.title }}</td>
                 <td>{{ history.date }}</td>
