@@ -50,6 +50,11 @@ h3 {
     grid-gap: 2px;
     padding: 5px;
 }
+h4{
+    color:white;
+    font-size:4rem;
+    font-style: italic;
+}
 @media (max-width: 600px){
     .image-div{
         display: grid;
@@ -58,6 +63,12 @@ h3 {
         padding: 5px;
         position: relative;
         margin-left: 30px;
+    }
+    h4{
+        color:white;
+        font-size:2.5rem;
+        font-style: italic;
+        
     }
 }
 .graph-div{
@@ -84,3 +95,196 @@ h3 {
 .sort-buttons{
     display: flex;
 }
+#welcome{
+        background: url('../img/news_media.png');
+        color: white;
+        height: 500px;
+        padding: 100px 0 0 0;
+
+}
+body{
+	font-family: 'arial';
+	margin: 0;
+	overflow-x: hidden;
+	padding: 0;
+
+}
+
+body{
+	font-family: 'arial';
+	margin: 0;
+	overflow-x: hidden;
+	padding: 0;
+
+}
+
+.animation-wrapper{
+	background: #ace5ee;
+	bottom: 0;
+	left: 0;
+	position: relative;
+	right: 0;
+	top: 0;
+}
+
+.water{
+    bottom: 0;
+    left: 0;
+	position: absolute;
+    width: 100%;
+}
+
+.water ul.waves{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.water ul.waves li{
+	background-repeat: repeat-x;
+}
+
+.water ul.waves li.wave-one{
+	animation: wave 8.7s linear infinite;
+	-webkit-animation-fill-mode: forwards;
+	-o-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+	bottom: 0px;
+	height: 50px;
+	left: 0;
+	position: absolute;
+	right: 0;
+	z-index: 10;
+    color:white;
+    font-size:4rem;
+    font-style: italic;
+}
+
+.water ul.waves li.wave-two{
+	-webkit-animation-fill-mode: forwards;
+	-o-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+	animation: wave 10s linear infinite;
+	bottom: 0px;
+	height: 84px;
+	left: 0;
+	position: absolute;
+	right: 0;
+	z-index: 9;
+    color:white;
+    font-size:4rem;
+    font-style: italic;
+
+}
+
+.water ul.waves li.wave-three{
+	-webkit-animation-fill-mode: forwards;
+	-o-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+	animation: wave 25s linear infinite;
+	bottom: 0;
+	height: 190px;
+	left: 0;
+	position: absolute;
+	right: 0;
+	z-index: 8;
+
+}
+
+.water ul.waves li.wave-four{
+	-webkit-animation-fill-mode: forwards;
+	-o-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+	animation: wave 25s linear infinite;
+	bottom: 0;
+	height: 205px;
+	left: 0;
+	position: absolute;
+	right: 0;
+}
+
+.boat{
+	animation: boat 3s linear infinite;
+    background-repeat: no-repeat;
+    bottom: 175px;
+    height: 145px;
+    left: 50%;
+	position: absolute;
+    width: 250px;
+}
+
+.cloud{
+	animation: cloud 30s linear infinite;
+	background-repeat: no-repeat;
+    height: 165px;
+    bottom: 520px;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.cloud2{
+	animation: cloud 20s linear infinite;
+	background-repeat: no-repeat;
+    bottom: 320px;
+    height: 165px;
+    left: 140px;
+    position: absolute;
+    width: 297px;
+}
+
+.dolphin{
+	animation: fish 15s linear infinite;
+	background-repeat: no-repeat;
+	bottom: 45px;
+	height: 80px;
+	left: 20%;
+	position: absolute;
+	width: 124px;
+	z-index: 9;
+}
+
+
+
+
+
+/*Animation Keyframe Section*/
+
+@keyframes wave{
+    0% {
+        background-position: 0 0;
+	}
+
+    100% {
+        background-position: 1920px 0;
+    }
+}
+
+@keyframes boat{
+	0%{
+		transform: rotate(0);
+	}
+
+	50%{
+		transform: rotate(-3deg);
+	}
+
+	100%{
+		transform: rotate(0);
+	}
+}
+
+@keyframes cloud{
+	0%{
+		left: 0;
+
+	}
+
+	100%{
+		left: 78%;
+    	}
+}
+
+
+
+
