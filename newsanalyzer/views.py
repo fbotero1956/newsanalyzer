@@ -78,23 +78,36 @@ def history_plotter_graph(request, feed="CNN Top Political Stories RSS"):
         char = []
         count = []
         run = 0
+        avg = 0
         for a in history:
             if a.title == feed:
                 run += 1
+                avg += a.positivity_index
                 char.append(run)
                 count.append(a.positivity_index)
-        #fig = plt.subplots(2,3)
+        avg = avg / run
+        avg = round(avg)
         plt.tight_layout()
-        f = plt.figure(figsize=(3,3), edgecolor='red')
-        
+        if avg > 2:
+            f = plt.figure(figsize=(3,3), facecolor='green')
+        else:
+            if avg < -2:
+                f = plt.figure(figsize=(3,3), facecolor='red')
+            else:
+                f = plt.figure(figsize=(3,3), facecolor='white')
+        ax = plt.axes()
+        ax.set_facecolor("white")
         plt.title(feed)
-        plt.xlabel('Run')
+        label = "Average: " + str(avg)
+        plt.xlabel(label)
         plt.ylabel('Index')
         plt.tight_layout()
+        plt.grid(axis = 'y')
         
         #plt.xticks(rotation='vertical')
         # bar1 = plt.plot(h, color='Green',alpha=0.65)
         plt.bar(char, count)
+
         #plt.savefig(f, bbox_inches='tight')
         canvas = FigureCanvasAgg(f)    
         response = HttpResponse(content_type='image/jpg')
